@@ -6,8 +6,8 @@
   -------------------------------
   -------------------------------
   -------------------------------
-Sketch uses 967971 bytes (73%) of program storage space. Maximum is 1310720 bytes.
-Global variables use 37248 bytes (11%) of dynamic memory, leaving 290432 bytes for local variables. Maximum is 327680 bytes.
+Sketch uses 983295 bytes (75%) of program storage space. Maximum is 1310720 bytes.
+Global variables use 37440 bytes (11%) of dynamic memory, leaving 290240 bytes for local variables. Maximum is 327680 bytes.
   -------------------------------
 */
 //= DEFINES ========================================================================================
@@ -18,9 +18,10 @@ Global variables use 37248 bytes (11%) of dynamic memory, leaving 290432 bytes f
 #define SUBSCRIBE_TOPIC MQTT_BASE_TOPIC "/command/+"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//#define DEBUG
+#define DEBUG
 //#define DEBUG_REMOTE
 //#define DEBUG_MQTT
+
 #define HAS_DISPLAY
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,12 +77,18 @@ void setup() {
 //**************************************************************************************************
 //OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 void loop() {
+  display_WriteLine("LOOP123456ABCD123456");
+  //
   wifi_MaintainConnection();
   mqtt_MaintainConnection();
   //
   if (mqtt_ShouldPublish()) {
     publishStatusDataToMqtt();
   }
+  //
+  delay(100 * TIME_TICK);
+  //
+  display_Clear();
   //
   delay(100 * TIME_TICK);
 }
