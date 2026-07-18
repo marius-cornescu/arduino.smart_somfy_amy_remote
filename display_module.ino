@@ -11,7 +11,7 @@
 #endif
 
 //= CONSTANTS ======================================================================================
-// 128×32 = [0.91 Inch OLED Module 0.91" White Blue 128X32 LCD LED Display 0.91" IIC Communicate]
+// 128×32 = [0.91 Inch OLED Module 0.91" White Blue 128X32 LCD LED Display 0.91" IIC Communicate] || 21 chars x 4 lines || "a12345678901234567890\nb12345678901234567890\nc12345678901234567890\nd12345678901234567890"
 // 128X64 = [TENSTAR ROBOT 1.3" OLED Display Module White Blue Color Drive Chip SH1106 128X64 1.3 Inch LCD IIC I2C]
 
 #ifdef HAS_DISPLAY
@@ -47,6 +47,8 @@ void display_Setup() {
   display.setTextSize(2);
   display.setCursor(0, 0);
   display_Clear();
+  //
+  display_Demo();
 #endif
   //..............................
   delay(1 * TIME_TICK);
@@ -79,6 +81,8 @@ void display_Write(const char* text) {
   strncat(displayBuffer, text, textLen);
   display.clearDisplay();
   display.setCursor(0, 0);
+  display.setTextSize(1);
+  display.setTextWrap(true);
   display.print(displayBuffer);
   display.display();
   debugPrint(F("DISPLAY:Write -> "));
@@ -102,6 +106,17 @@ void display_WriteLine(const char* text) {
 void display_WriteLine(const __FlashStringHelper* text) {
 #ifdef HAS_DISPLAY
   display_Write(text);
+#endif
+}
+//==================================================================================================
+void display_Demo() {
+#ifdef HAS_DISPLAY
+  display.clearDisplay();
+  display.ssd1306_command(SSD1306_DISPLAYALLON);  // turn the entire display on, all pixels lit
+  display.display();
+  delay(2 * SEC);  // hold the pixels full-on
+  display.ssd1306_command(SSD1306_DISPLAYALLON_RESUME);  // resume display rendering
+  display.display();
 #endif
 }
 //==================================================================================================

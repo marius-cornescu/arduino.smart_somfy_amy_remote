@@ -77,7 +77,8 @@ void setup() {
 //**************************************************************************************************
 //OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 void loop() {
-  display_WriteLine("LOOP123456ABCD123456");
+  display_Write("a12345678901234567890\nb12345678901234567890\nc12345678901234567890\nd12345678901234567890");
+  //display_Demo();
   //
   wifi_MaintainConnection();
   mqtt_MaintainConnection();
@@ -86,7 +87,7 @@ void loop() {
     publishStatusDataToMqtt();
   }
   //
-  delay(100 * TIME_TICK);
+  delay(500 * TIME_TICK);
   //
   display_Clear();
   //
