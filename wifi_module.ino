@@ -17,11 +17,6 @@ const char ssid[] = WIFI_SSID;
 const char pass[] = WIFI_PASSWORD;
 
 //= VARIABLES ======================================================================================
-#if defined(ESP8266)
-  Client wifiClient = espClient;
-#elif defined(ESP32)
-  Client wifiClient = client;
-#endif
 
 unsigned long lastWiFiCheckTime = 0;
 const unsigned long wifiCheckInterval = 60 * SEC;

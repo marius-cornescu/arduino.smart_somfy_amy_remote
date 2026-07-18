@@ -5,14 +5,17 @@
   -------------------------------
   -------------------------------
   -------------------------------
-
+  -------------------------------
+Sketch uses 967971 bytes (73%) of program storage space. Maximum is 1310720 bytes.
+Global variables use 37248 bytes (11%) of dynamic memory, leaving 290432 bytes for local variables. Maximum is 327680 bytes.
+  -------------------------------
 */
 //= DEFINES ========================================================================================
 //
-#define PUBLISH_PORT_TOPIC "home/remote/somfy-remote/port/"
-#define PUBLISH_STATUS_TOPIC "home/remote/somfy-remote/status"
-
-#define SUBSCRIBE_TOPIC "home/remote/somfy-remote/command/+"
+#define MQTT_BASE_TOPIC "home/remote/somfy-remote"
+#define PUBLISH_PORT_TOPIC MQTT_BASE_TOPIC "/port/"
+#define PUBLISH_STATUS_TOPIC MQTT_BASE_TOPIC "/status"
+#define SUBSCRIBE_TOPIC MQTT_BASE_TOPIC "/command/+"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //#define DEBUG
@@ -29,14 +32,17 @@
 #include <PubSubClient.h>
 #include <Wire.h>
 
-//= CONSTANTS ======================================================================================
 #if defined(ESP8266)
-  Client wifiClient = espClient;
+  #include <ESP8266WiFi.h>
 #elif defined(ESP32)
-  Client wifiClient = client;
+  #include <WiFi.h>
 #endif
 
+//= CONSTANTS ======================================================================================
+
+
 //= VARIABLES ======================================================================================
+WiFiClient wifiClient;
 
 
 //##################################################################################################
