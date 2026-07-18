@@ -21,6 +21,7 @@ Global variables use 37248 bytes (11%) of dynamic memory, leaving 290432 bytes f
 //#define DEBUG
 //#define DEBUG_REMOTE
 //#define DEBUG_MQTT
+#define HAS_DISPLAY
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #define OFF 0x1
@@ -62,9 +63,9 @@ void setup() {
   //
   wifi_Setup();
   //
-  //pins_Setup();
-  //
   mqtt_Setup();
+  //
+  display_Setup();
   //
   digitalWrite(LED_BUILTIN, OFF);
   //
