@@ -12,7 +12,7 @@ const char* mqtt_server = MQTT_BROKER_ADDRESS;
 unsigned long PUBLISH_COLLDOWN_TIME = 5 * SEC;  // value in milliseconds
 
 //= VARIABLES ======================================================================================
-PubSubClient mqttClient(espClient);
+PubSubClient mqttClient(wifiClient);
 unsigned long lastMqttPublish = 0;
 
 //##################################################################################################

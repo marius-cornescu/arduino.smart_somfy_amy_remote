@@ -3,7 +3,12 @@
 //= INCLUDES =======================================================================================
 #include "Common.h"
 #include "Secrets.h"
-#include <ESP8266WiFi.h>
+
+#if defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+  #include <WiFi.h>
+#endif
 
 //= CONSTANTS ======================================================================================
 const char host_name[] = HOST_NAME;
@@ -12,6 +17,11 @@ const char ssid[] = WIFI_SSID;
 const char pass[] = WIFI_PASSWORD;
 
 //= VARIABLES ======================================================================================
+#if defined(ESP8266)
+  Client wifiClient = espClient;
+#elif defined(ESP32)
+  Client wifiClient = client;
+#endif
 
 unsigned long lastWiFiCheckTime = 0;
 const unsigned long wifiCheckInterval = 60 * SEC;
@@ -25,8 +35,12 @@ void wifi_Setup() {
   debugPrintln(F("Wifi:Setup >>>"));
   //..............................
   delay(TIME_TICK);
+#if defined(ESP8266)
   WiFi.hostname(host_name);
   WiFi.setOutputPower(0);  // Sets WiFi RF power output to lowest level, lowest RF power usage
+#elif defined(ESP32)
+  WiFi.setHostname(host_name);
+#endif
   // We start by connecting to a WiFi network
   debugPrintln(F(""));
   debugPrint(F("Connecting to "));

@@ -8,9 +8,16 @@
 
 */
 //= DEFINES ========================================================================================
+//
+#define PUBLISH_PORT_TOPIC "home/remote/somfy-remote/port/"
+#define PUBLISH_STATUS_TOPIC "home/remote/somfy-remote/status"
+
+#define SUBSCRIBE_TOPIC "home/remote/somfy-remote/command/+"
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //#define DEBUG
 //#define DEBUG_REMOTE
+//#define DEBUG_MQTT
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #define OFF 0x1
@@ -19,9 +26,15 @@
 
 //= INCLUDES =======================================================================================
 #include "Common.h"
-
+#include <PubSubClient.h>
+#include <Wire.h>
 
 //= CONSTANTS ======================================================================================
+#if defined(ESP8266)
+  Client wifiClient = espClient;
+#elif defined(ESP32)
+  Client wifiClient = client;
+#endif
 
 //= VARIABLES ======================================================================================
 
@@ -43,7 +56,7 @@ void setup() {
   //
   wifi_Setup();
   //
-  pins_Setup();
+  //pins_Setup();
   //
   mqtt_Setup();
   //
@@ -59,7 +72,7 @@ void loop() {
   wifi_MaintainConnection();
   mqtt_MaintainConnection();
   //
-  if (comm_ActIfReceivedMessage() && mqtt_ShouldPublish()) {
+  if (mqtt_ShouldPublish()) {
     publishStatusDataToMqtt();
   }
   //
@@ -68,16 +81,15 @@ void loop() {
 //OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 //==================================================================================================
 void publishStatusDataToMqtt() {
-  digitalWrite(LED_INDICATOR_PIN, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   //
   // could print sw version; params like PUBLISH_COLLDOWN_TIME
   //
-  char statusReport[4];
-  utoa((unsigned)voltage_supply, statusReport, 10);
-  mqtt_PublishString(PUBLISH_STATUS_TOPIC, statusReport);
+  // char statusReport[4];
+  // utoa((unsigned)voltage_supply, statusReport, 10);
+  // mqtt_PublishString(PUBLISH_STATUS_TOPIC, statusReport);
   //
-  digitalWrite(LED_INDICATOR_PIN, HIGH);
-}
+  digitalWrite(LED_BUILTIN, HIGH);
 }
 //==================================================================================================
 
