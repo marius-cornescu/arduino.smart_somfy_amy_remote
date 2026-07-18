@@ -1,0 +1,1 @@
+# arduino.smart_somfy_amy_remote
