@@ -49,9 +49,7 @@ void wifi_Setup() {
   }
 
   debugPrintln(F(""));
-  debugPrint(F("WiFi connected | "));
-  debugPrint(F("IP address: "));
-  debugPrintln(WiFi.localIP());
+  debugPrintln(wifi_GetConnectionStatusText());
   //..............................
   delay(10 * TIME_TICK);
   debugPrintln(F("Wifi:Setup <<<"));
@@ -74,5 +72,17 @@ void wifi_MaintainConnection() {
       wifiDisconnectTime = 0; // Reset the disconnect time if WiFi is connected
     }
   }
+}
+//==================================================================================================
+const char* wifi_GetConnectionStatusText() {
+  static char statusBuffer[48];
+
+  if (WiFi.status() == WL_CONNECTED) {
+    String ipAddress = WiFi.localIP().toString();
+    snprintf(statusBuffer, sizeof(statusBuffer), "WiFi connected | IP: %s", ipAddress.c_str());
+    return statusBuffer;
+  }
+
+  return "WiFi disconnected";
 }
 //==================================================================================================

@@ -77,7 +77,9 @@ void setup() {
 //**************************************************************************************************
 //OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 void loop() {
-  display_Write("a12345678901234567890\nb12345678901234567890\nc12345678901234567890\nd12345678901234567890");
+  //display_Write("a12345678901234567890\nb12345678901234567890\nc12345678901234567890\nd12345678901234567890");
+  display_SetLine(0, wifi_GetConnectionStatusText());
+  display_SetLine(1, mqtt_GetConnectionStatusText());
   //display_Demo();
   //
   wifi_MaintainConnection();

@@ -106,3 +106,11 @@ bool mqtt_ShouldPublish() {
   }
 }
 //==================================================================================================
+const char* mqtt_GetConnectionStatusText() {
+  if (mqttClient.connected()) {
+    return "MQTT connected";
+  }
+
+  return "MQTT disconnected";
+}
+//==================================================================================================

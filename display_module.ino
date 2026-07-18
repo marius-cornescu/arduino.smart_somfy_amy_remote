@@ -1,5 +1,7 @@
 //= DEFINES ========================================================================================
 
+// https://github.com/adafruit/Adafruit_SSD1306/blob/master/Adafruit_SSD1306.h
+
 //= INCLUDES =======================================================================================
 #include "Common.h"
 #include <string.h>
@@ -16,6 +18,8 @@
 
 #ifdef HAS_DISPLAY
   #define DISPLAY_BUFFER_SIZE 128
+  #define DISPLAY_LINE_COUNT 4
+  #define DISPLAY_LINE_LENGTH 21
 // 
   #define SCREEN_WIDTH 128
   #define SCREEN_HEIGHT 32
@@ -27,6 +31,7 @@
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 char displayBuffer[DISPLAY_BUFFER_SIZE] = {0};
+char displayLines[DISPLAY_LINE_COUNT][DISPLAY_LINE_LENGTH + 1] = {{0}};
 
 #endif
 
@@ -48,7 +53,7 @@ void display_Setup() {
   display.setCursor(0, 0);
   display_Clear();
   //
-  display_Demo();
+  _display_Demo();
 #endif
   //..............................
   delay(1 * TIME_TICK);
@@ -59,9 +64,48 @@ void display_Setup() {
 void display_Clear() {
 #ifdef HAS_DISPLAY
   memset(displayBuffer, 0, sizeof(displayBuffer));
+  memset(displayLines, 0, sizeof(displayLines));
   display.clearDisplay();
   display.display();
   debugPrintln(F("DISPLAY:Clear"));
+#endif
+}
+//==================================================================================================
+void _display_Render() {
+#ifdef HAS_DISPLAY
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextWrap(false);
+
+  for (uint8_t lineIndex = 0; lineIndex < DISPLAY_LINE_COUNT; ++lineIndex) {
+    display.setCursor(0, lineIndex * 8);
+    display.print(displayLines[lineIndex]);
+  }
+
+  display.display();
+#endif
+}
+//==================================================================================================
+void display_SetLine(uint8_t lineIndex, const char* text) {
+#ifdef HAS_DISPLAY
+  if (lineIndex >= DISPLAY_LINE_COUNT || text == nullptr) {
+    return;
+  }
+
+  strncpy(displayLines[lineIndex], text, DISPLAY_LINE_LENGTH);
+  displayLines[lineIndex][DISPLAY_LINE_LENGTH] = '\0';
+  _display_Render();
+#endif
+}
+//==================================================================================================
+void display_SetLine(uint8_t lineIndex, const __FlashStringHelper* text) {
+#ifdef HAS_DISPLAY
+  if (lineIndex >= DISPLAY_LINE_COUNT || text == nullptr) {
+    return;
+  }
+
+  display_SetLine(lineIndex, String(text).c_str());
 #endif
 }
 //==================================================================================================
@@ -109,7 +153,7 @@ void display_WriteLine(const __FlashStringHelper* text) {
 #endif
 }
 //==================================================================================================
-void display_Demo() {
+void _display_Demo() {
 #ifdef HAS_DISPLAY
   display.clearDisplay();
   display.ssd1306_command(SSD1306_DISPLAYALLON);  // turn the entire display on, all pixels lit
