@@ -20,8 +20,10 @@ const byte REMOTE_BUTTON_RELEASE_LEVEL = HIGH;
 void remote_Setup() {
   debugPrintln(F("REMOTE:Setup >>>"));
   //..............................
-  pinMode(SOUND_SENSOR_PIN, INPUT);  // Set the sound signal pin as input
-  analogSetPinAttenuation(SOUND_SENSOR_PIN, ADC_11db);
+  for (byte i = 0; i < ARRAY_LEN(REMOTE_BUTTON_PORTS); ++i) {
+    pinMode(REMOTE_BUTTON_PORTS[i], OUTPUT);
+    digitalWrite(REMOTE_BUTTON_PORTS[i], REMOTE_BUTTON_RELEASE_LEVEL);
+  }
   //..............................
   delay(1 * TIME_TICK);
   debugPrintln(F("REMOTE:Setup <<<"));
@@ -64,7 +66,7 @@ void remote_PressButtonWithDuration(byte buttonId, bool longPress) {
 
   pinMode(buttonPort, OUTPUT);
   digitalWrite(buttonPort, REMOTE_BUTTON_ACTIVE_LEVEL);
-  delay(longPress ? (2 * TIME_TICK) : TIME_TICK);
+  delay(longPress ? (4 * TIME_TICK) : TIME_TICK);
   digitalWrite(buttonPort, REMOTE_BUTTON_RELEASE_LEVEL);
 }
 //==================================================================================================
