@@ -7,16 +7,12 @@
 #include <Wire.h>
 
 //= CONSTANTS ======================================================================================
-const unsigned int MIN_ANALOG_VAL = 0;
-const unsigned int MAX_ANALOG_VAL = 4096;
+const byte REMOTE_BUTTON_PORTS[] = {A0, A1, A2, A3};  // button 1 -> A0, 2 -> A1, 3 -> A2, 4 -> A3
+const byte REMOTE_BUTTON_ACTIVE_LEVEL = LOW;
+const byte REMOTE_BUTTON_RELEASE_LEVEL = HIGH;
 
 //= VARIABLES ======================================================================================
-//uint16_t noiseLevel = 0;
 
-#ifdef DEBUG_REMOTE
-unsigned int minSampleVal = MAX_ANALOG_VAL;
-unsigned int maxSampleVal = MIN_ANALOG_VAL;
-#endif
 
 //##################################################################################################
 //==================================================================================================
@@ -32,15 +28,43 @@ void remote_Setup() {
 }
 //**************************************************************************************************
 //==================================================================================================
-int remote_GetNoiseLevelAverage(byte sampleSize) {
-
-#ifdef DEBUG_REMOTE
-  debugPrint(F("Loudness:"));
-  debugPrintln(F(""));
-#endif
-
-  return 0;
+void remote_PressButton(byte buttonId) {
+  remote_PressButtonWithDuration(buttonId, false);
 }
 //==================================================================================================
+void remote_PressButtonShort(byte buttonId) {
+  remote_PressButtonWithDuration(buttonId, false);
+}
+//==================================================================================================
+void remote_PressButtonLong(byte buttonId) {
+  remote_PressButtonWithDuration(buttonId, true);
+}
+//==================================================================================================
+byte remote_GetButtonPort(byte buttonId) {
+  if (buttonId < 1 || buttonId > ARRAY_LEN(REMOTE_BUTTON_PORTS)) {
+    return 0xFF;
+  }
 
+  return REMOTE_BUTTON_PORTS[buttonId - 1];
+}
+//==================================================================================================
+void remote_PressButtonWithDuration(byte buttonId, bool longPress) {
+  byte buttonPort = remote_GetButtonPort(buttonId);
+  if (buttonPort == 0xFF) {
+    debugPrintln(F("REMOTE: Invalid button id"));
+    return;
+  }
+
+  debugPrint(F("REMOTE: Press button "));
+  debugPrint(buttonId);
+  debugPrint(F(" on port "));
+  debugPrint(buttonPort);
+  debugPrint(longPress ? F(" (long)") : F(" (short)"));
+  debugPrintln(F(""));
+
+  pinMode(buttonPort, OUTPUT);
+  digitalWrite(buttonPort, REMOTE_BUTTON_ACTIVE_LEVEL);
+  delay(longPress ? (2 * TIME_TICK) : TIME_TICK);
+  digitalWrite(buttonPort, REMOTE_BUTTON_RELEASE_LEVEL);
+}
 //==================================================================================================

@@ -16,9 +16,6 @@
 #define OFF 0x1
 #define ON 0x0
 
-#define VCC_SENSOR_PIN A0
-#define SOUND_SENSOR_PIN A1
-
 
 //= INCLUDES =======================================================================================
 #include "Common.h"
@@ -33,51 +30,54 @@
 //==================================================================================================
 //**************************************************************************************************
 void setup() {
-// #if defined(DEBUG) || defined(DEBUG_REMOTE)
-//   // Open serial communications and wait for port to open:
-//   Serial.begin(115200);
-//   while (!Serial) { ; }
-//   delay(5 * SEC);
-// #endif
+#ifdef DEBUG
+  // Open serial communications and wait for port to open:
+  Serial.begin(115200);
+  while (!Serial) { ; }
+#endif
   debugPrintln(F("START-UP >>>>>>>>>>>>>>>"));
   //..............................
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, ON);
   //..............................
   //
-  bcm_Setup();
+  wifi_Setup();
+  //
+  pins_Setup();
+  //
+  mqtt_Setup();
   //
   digitalWrite(LED_BUILTIN, OFF);
+  //
+  delay(1 * TIME_TICK);
   //..............................
   debugPrintln(F("START-UP <<<<<<<<<<<<<<<"));
 }
 //**************************************************************************************************
 //OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 void loop() {
-  debugPrintln(F("##############################"));
+  wifi_MaintainConnection();
+  mqtt_MaintainConnection();
   //
-  bool shouldPublishMeasurements = collectMeasurements();
-  //
-  if (shouldPublishMeasurements) {
-    debugPrintln(F("MAIN: Publish measurements"));
-    //
-    digitalWrite(LED_BUILTIN, ON);
-    //
-
-    //
-    digitalWrite(LED_BUILTIN, OFF);
+  if (comm_ActIfReceivedMessage() && mqtt_ShouldPublish()) {
+    publishStatusDataToMqtt();
   }
   //
-  //sleepFDRS(PERIOD_MEASUREMENT);
+  delay(100 * TIME_TICK);
 }
 //OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 //==================================================================================================
-bool collectMeasurements() {
-  debugPrintln(F("MAIN: Collect measurements"));
+void publishStatusDataToMqtt() {
+  digitalWrite(LED_INDICATOR_PIN, LOW);
   //
-
+  // could print sw version; params like PUBLISH_COLLDOWN_TIME
   //
-  return true;
+  char statusReport[4];
+  utoa((unsigned)voltage_supply, statusReport, 10);
+  mqtt_PublishString(PUBLISH_STATUS_TOPIC, statusReport);
+  //
+  digitalWrite(LED_INDICATOR_PIN, HIGH);
+}
 }
 //==================================================================================================
 
