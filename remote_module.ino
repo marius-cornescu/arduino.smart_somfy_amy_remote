@@ -1,4 +1,6 @@
 //= DEFINES ========================================================================================
+#define REMOTE_SHORT_PRESS_DURATION 100 // 50–200ms
+#define REMOTE_LONG_PRESS_DURATION 1000 // 500–2000ms
 
 //= INCLUDES =======================================================================================
 #include "Common.h"
@@ -28,19 +30,15 @@ void remote_Setup() {
 }
 //**************************************************************************************************
 //==================================================================================================
-void remote_PressButton(byte buttonId) {
-  remote_PressButtonWithDuration(buttonId, false);
-}
-//==================================================================================================
 void remote_PressButtonShort(byte buttonId) {
-  remote_PressButtonWithDuration(buttonId, false);
+  _PressButtonWithDuration(buttonId, false);
 }
 //==================================================================================================
 void remote_PressButtonLong(byte buttonId) {
-  remote_PressButtonWithDuration(buttonId, true);
+  _PressButtonWithDuration(buttonId, true);
 }
 //==================================================================================================
-byte remote_GetButtonPort(byte buttonId) {
+byte _GetButtonPort(byte buttonId) {
   if (buttonId < 1 || buttonId > ARRAY_LEN(REMOTE_BUTTON_PORTS)) {
     return 0xFF;
   }
@@ -48,8 +46,8 @@ byte remote_GetButtonPort(byte buttonId) {
   return REMOTE_BUTTON_PORTS[buttonId - 1];
 }
 //==================================================================================================
-void remote_PressButtonWithDuration(byte buttonId, bool longPress) {
-  byte buttonPort = remote_GetButtonPort(buttonId);
+void _PressButtonWithDuration(byte buttonId, bool longPress) {
+  byte buttonPort = _GetButtonPort(buttonId);
   if (buttonPort == 0xFF) {
     debugPrintln(F("REMOTE: Invalid button id"));
     return;
@@ -64,7 +62,7 @@ void remote_PressButtonWithDuration(byte buttonId, bool longPress) {
 
   pinMode(buttonPort, OUTPUT);
   digitalWrite(buttonPort, REMOTE_BUTTON_ACTIVE_LEVEL);
-  delay(longPress ? (4 * TIME_TICK) : TIME_TICK);
+  delay(longPress ? REMOTE_LONG_PRESS_DURATION : REMOTE_SHORT_PRESS_DURATION);
   digitalWrite(buttonPort, REMOTE_BUTTON_RELEASE_LEVEL);
 }
 //==================================================================================================

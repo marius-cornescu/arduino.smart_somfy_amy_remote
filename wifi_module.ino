@@ -79,7 +79,7 @@ const char* wifi_GetConnectionStatusText() {
 
   if (WiFi.status() == WL_CONNECTED) {
     String ipAddress = WiFi.localIP().toString();
-    snprintf(statusBuffer, sizeof(statusBuffer), "WiFi connected | IP: %s", ipAddress.c_str());
+    snprintf(statusBuffer, sizeof(statusBuffer), "WiFi %s", ipAddress.c_str());
     return statusBuffer;
   }
 
