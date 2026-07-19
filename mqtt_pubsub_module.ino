@@ -1,4 +1,5 @@
 //= DEFINES ========================================================================================
+#define MQTT_MAX_TOPIC_HANDLERS 8
 
 //= INCLUDES =======================================================================================
 #include "Common.h"
@@ -12,8 +13,15 @@ const char* mqtt_server = MQTT_BROKER_ADDRESS;
 unsigned long PUBLISH_COLLDOWN_TIME = 5 * SEC;  // value in milliseconds
 
 //= VARIABLES ======================================================================================
+struct MqttTopicHandlerEntry {
+  const char* topic;
+  MqttTopicHandler handler;
+};
+
 PubSubClient mqttClient(wifiClient);
 unsigned long lastMqttPublish = 0;
+static MqttTopicHandlerEntry mqttTopicHandlers[MQTT_MAX_TOPIC_HANDLERS];
+static byte mqttTopicHandlerCount = 0;
 
 //##################################################################################################
 //==================================================================================================
@@ -21,6 +29,7 @@ unsigned long lastMqttPublish = 0;
 void mqtt_Setup() {
   debugPrintln(F("Mqtt:Setup >>>"));
   //..............................
+  mqttTopicHandlerCount = 0;
   mqttClient.setServer(mqtt_server, 1883);
   mqttClient.setCallback(mqtt_Callback);
   //..............................
@@ -62,21 +71,39 @@ void mqtt_Callback(char* topic, byte* message, unsigned int length) {
   debugPrint(topic);
   debugPrint(F(". Message: "));
 
+  String topicTemp(topic);
   String messageTemp;
 
-  for (int i = 0; i < length; i++) {
+  for (unsigned int i = 0; i < length; i++) {
     debugPrint((char)message[i]);
     messageTemp += (char)message[i];
   }
   debugPrintln();
 
-  // if (String(topic).endsWith("/speed")) {
-  //   byte newVentSpeed = messageTemp.toInt();
-  //   onVentilationSpeedChanged(newVentSpeed, true);
-  // } else if (String(topic).endsWith("/actionCode")) {
-  //   byte newActionCode = messageTemp.toInt();
-  //   onActionCodeChanged(newActionCode, true);
-  // }
+  _DispatchMessage(topicTemp, messageTemp);
+}
+//==================================================================================================
+void mqtt_RegisterHandler(const char* topic, MqttTopicHandler handler) {
+  if (mqttTopicHandlerCount >= MQTT_MAX_TOPIC_HANDLERS) {
+    debugPrintln(F("MQTT: maximum topic handlers reached"));
+    return;
+  }
+
+  mqttTopicHandlers[mqttTopicHandlerCount].topic = topic;
+  mqttTopicHandlers[mqttTopicHandlerCount].handler = handler;
+  mqttTopicHandlerCount++;
+}
+//==================================================================================================
+void _DispatchMessage(const String& topic, const String& message) {
+  for (byte i = 0; i < mqttTopicHandlerCount; ++i) {
+    if (topic.equals(mqttTopicHandlers[i].topic)) {
+      mqttTopicHandlers[i].handler(topic, message);
+      return;
+    }
+  }
+
+  debugPrint(F("MQTT: No handler registered for topic "));
+  debugPrintln(topic);
 }
 //==================================================================================================
 void mqtt_PublishInt(const char* topic, int value) {

@@ -22,6 +22,24 @@ A compact Arduino sketch for a MakerGO ESP32 C3 SuperMini remote that connects t
 ---
 ---
 
+# Operations
+
+
+## MQTT Commands
+
+home/remote/somfy-remote/command/button-1 => SHORT-PRESS
+home/remote/somfy-remote/command/button-1 => LONG-PRESS
+
+home/remote/somfy-remote/command/button-2 => SHORT-PRESS
+home/remote/somfy-remote/command/button-2 => LONG-PRESS
+
+home/remote/somfy-remote/command/button-3 => SHORT-PRESS
+home/remote/somfy-remote/command/button-3 => LONG-PRESS
+
+
+---
+---
+
 # High-Level Design: MQTT-Controlled Remote Emulator
 
 ---

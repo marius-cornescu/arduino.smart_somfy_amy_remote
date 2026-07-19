@@ -1,6 +1,8 @@
 #pragma once
 #ifndef _HEADERFILE_COMMON
 #define _HEADERFILE_COMMON
+#include <Arduino.h>
+
 //= CONSTANTS ======================================================================================
 #define SW_VERSION "2026.07.18"
 //------------------------------------------------
@@ -29,6 +31,9 @@
 void (*resetFunc)(void) = 0;  // declare reset fuction at address 0
 
 //------------------------------------------------
+
+typedef void (*MqttTopicHandler)(const String& topic, const String& message);
+//void mqtt_RegisterHandler(const char* topic, MqttTopicHandler handler);
 
 //------------------------------------------------
 

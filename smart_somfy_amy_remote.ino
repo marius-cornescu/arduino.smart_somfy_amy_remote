@@ -19,8 +19,8 @@ Global variables use 37440 bytes (11%) of dynamic memory, leaving 290240 bytes f
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #define DEBUG
-//#define DEBUG_REMOTE
-//#define DEBUG_MQTT
+// #define DEBUG_REMOTE
+// #define DEBUG_MQTT
 
 #define HAS_DISPLAY
 
@@ -28,33 +28,32 @@ Global variables use 37440 bytes (11%) of dynamic memory, leaving 290240 bytes f
 #define OFF 0x1
 #define ON 0x0
 
-
 //= INCLUDES =======================================================================================
 #include "Common.h"
 #include <PubSubClient.h>
 #include <Wire.h>
 
 #if defined(ESP8266)
-  #include <ESP8266WiFi.h>
+#include <ESP8266WiFi.h>
 #elif defined(ESP32)
-  #include <WiFi.h>
+#include <WiFi.h>
 #endif
 
 //= CONSTANTS ======================================================================================
 
-
 //= VARIABLES ======================================================================================
 WiFiClient wifiClient;
 
-
-//##################################################################################################
+// ##################################################################################################
 //==================================================================================================
 //**************************************************************************************************
 void setup() {
 #ifdef DEBUG
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
-  while (!Serial) { ; }
+  while (!Serial) {
+    ;
+  }
 #endif
   debugPrintln(F("START-UP >>>>>>>>>>>>>>>"));
   //..............................
@@ -65,6 +64,9 @@ void setup() {
   wifi_Setup();
   //
   mqtt_Setup();
+  _SetupMqttTopicHandlers();
+  //
+  remote_Setup();
   //
   display_Setup();
   //
@@ -75,12 +77,11 @@ void setup() {
   debugPrintln(F("START-UP <<<<<<<<<<<<<<<"));
 }
 //**************************************************************************************************
-//OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+// OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 void loop() {
+  //
   display_SetLine(0, wifi_GetConnectionStatusText());
   display_SetLine(1, mqtt_GetConnectionStatusText());
-  display_SetLine(2, "ABC");
-  display_SetLine(3, "XYZ");
   //
   wifi_MaintainConnection();
   mqtt_MaintainConnection();
@@ -89,13 +90,19 @@ void loop() {
     publishStatusDataToMqtt();
   }
   //
-  delay(500 * TIME_TICK);
-  //
-  display_Clear();
-  //
   delay(100 * TIME_TICK);
 }
-//OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+// OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+//==================================================================================================
+void _SetupMqttTopicHandlers() {
+  mqtt_RegisterHandler(MQTT_BASE_TOPIC "/command/button-1", onButton1Command_fromMqtt);
+
+
+
+
+  mqtt_RegisterHandler(MQTT_BASE_TOPIC "/command/button-2", onButton2Command_fromMqtt);
+  mqtt_RegisterHandler(MQTT_BASE_TOPIC "/command/button-3", onButton3Command_fromMqtt);
+}
 //==================================================================================================
 void publishStatusDataToMqtt() {
   digitalWrite(LED_BUILTIN, LOW);
@@ -109,5 +116,63 @@ void publishStatusDataToMqtt() {
   digitalWrite(LED_BUILTIN, HIGH);
 }
 //==================================================================================================
+void onButton1Command_fromMqtt(const String &topic, const String &message) {
+  (void)topic;
 
+  if ("SHORT-PRESS".equalsIgnoreCase(message)) {
+    remote_PressButtonShort(1);
+    //
+    display_SetLine(2, "B1 ShortPress");
+
+  } else if ("LONG-PRESS".equalsIgnoreCase(message)) {
+    remote_PressButtonLong(1);
+    //
+    display_SetLine(2, "B1 LongPress");
+
+  } else {
+    debugPrint(F("Unknown command for button 1: "));
+    debugPrintln(message);
+
+  }
+}
+//==================================================================================================
+void onButton2Command_fromMqtt(const String &topic, const String &message) {
+  (void)topic;
+
+  if ("SHORT-PRESS".equalsIgnoreCase(message)) {
+    remote_PressButtonShort(2);
+    //
+    display_SetLine(2, "B2 ShortPress");
+
+  } else if ("LONG-PRESS".equalsIgnoreCase(message)) {
+    remote_PressButtonLong(2);
+    //
+    display_SetLine(2, "B2 LongPress");
+
+  } else {
+    debugPrint(F("Unknown command for button 2: "));
+    debugPrintln(message);
+    
+  }
+}
+//==================================================================================================
+void onButton3Command_fromMqtt(const String &topic, const String &message) {
+  (void)topic;
+
+  if ("SHORT-PRESS".equalsIgnoreCase(message)) {
+    remote_PressButtonShort(3);
+    //
+    display_SetLine(2, "B3 ShortPress");
+
+  } else if ("LONG-PRESS".equalsIgnoreCase(message)) {
+    remote_PressButtonLong(3);
+    //
+    display_SetLine(2, "B3 LongPress");
+
+  } else {
+    debugPrint(F("Unknown command for button 3: "));
+    debugPrintln(message);
+    
+  }
+}
 //==================================================================================================
